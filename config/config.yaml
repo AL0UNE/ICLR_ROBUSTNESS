@@ -1,0 +1,74 @@
+# Benchmark configuration.
+
+defaults:
+  random_state: 42     # global reproducibility seed: also threaded into the
+                       # perturbation noise realisations 
+  n_folds: 10
+
+  n_jobs: 1           # outer (model x fold) parallelism — raise this first
+  n_jobs_train: 1      # CPU threads *inside* each fit keep
+                       # n_jobs * n_jobs_train <= physical cores.
+  n_jobs_predict: 1    # jobs during prediction
+  n_jobs_gs: 1         # jobs for the hyperparameter search
+
+  # Opt-in: train every (model, fold) pair for a level concurrently instead of
+  # one fold at a time. 
+  train_across_folds: false
+  fold_n_jobs: 1
+
+  # Tuning hpo: false => library defaults.
+  hpo: false           # enable hyperparameter optimisation
+  n_search_gs: 15      # sampled hyperparameter configurations
+  no_inner_fold: false # single inner split instead of 3-fold inner CV
+
+  # Train/predict split: score each fold with no model training in flight, so
+  # "Test pred time" is uncontended even when training runs with n_jobs > 1.
+  # Keep this true whenever th reported prediction times matter; 
+  split_train_predict: true
+
+  # Hardware: "cuda"/"cpu" for XGBoost, "gpu"/"cpu" for LightGBM, "cuda"/"cpu" for RealMLP
+  xgboost_device: cpu
+  lightgbm_device: cpu
+  realmlp_device: cpu
+
+  models:
+    Logistic: true             
+    Linear: false             
+    LASSO: true
+    Ridge: true
+    Random Forest: true
+    Gradient Boosting: true
+    XGBoost: true
+    LightGBM: false
+    CatBoost: true
+    TabPFNv3: false            
+    TabICLv2: false            
+    TabDPT: false              
+    RealMLP: false             
+
+  # Preset best-params repository. Replaying it gives tuned params without a
+  # live search. preset_path (classification) and preset_path_reg (regression)
+  # are relative to the repo root; regression ranks candidates by RMSE. preset/
+  # results_hpo and preset/results_hpo_reg hold the raw timestamped HPO run
+  # outputs those repos were curated from. 
+  preset_enabled: false
+  preset_strict: false
+  preset_path: preset/results_hpo_cpu
+  preset_path_reg: preset/results_hpo_reg_cpu
+  preset_top_k: 5
+
+  # Composite (multi-perturbation) benchmarks
+  n_composites: 50
+  # The first (composite_start - 1) sampled composites are skipped 
+  # (e.g. to resume a partially-completed run). 
+  # The full set is still sampled/reported so the recipes stay reproducible; 
+  # only the training of the earlier composites is skipped. 1 = run all.
+  composite_start: 1
+  n_perturb_types_per_composite: 3
+
+  # Regression-specific
+  batch_size: null     # prediction batch size (null -> 100000)
+  n_training_sample: 1 
+
+  mask_cache_enabled: true
+  mask_cache_size: 64

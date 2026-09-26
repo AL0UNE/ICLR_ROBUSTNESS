@@ -1,0 +1,55 @@
+[project]
+name = "robustness"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "catboost==1.2.10",
+    "lightgbm==4.6.0",
+    "pytabkit>=1.5.0",
+    "pyyaml>=6.0",
+    "scikit-learn==1.8.0",
+    "tabdpt>=1.2.0",
+    "tabicl==2.1.1",
+    "tabpfn>=8.0.8",
+    "xgboost==3.2.0",
+]
+
+[project.optional-dependencies]
+cpu = [
+  "torch>=2.11.0",
+  "torchvision>=0.26.0",
+]
+cu130 = [
+  "torch>=2.11.0",
+  "torchvision>=0.26.0",
+]
+
+[tool.uv]
+conflicts = [
+  [
+    { extra = "cpu" },
+    { extra = "cu130" },
+  ],
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-cu130", extra = "cu130" },
+]
+torchvision = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-cu130", extra = "cu130" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
